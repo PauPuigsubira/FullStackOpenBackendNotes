@@ -1,15 +1,43 @@
-const http = require('http')
-/*
+//const http = require('http')
 const express = require("express");
+/*
 const math = require("./math");
-const app = express();
 const androidData = require("./quizData");
 */
+let notes = [
+  {
+    id: 1,
+    content: "HTML is easy",
+    important: true
+  },
+  {
+    id: 2,
+    content: "Browser can execute only JavaScript",
+    important: false
+  },
+  {
+    id: 3,
+    content: "GET and POST are the most important methods of HTTP protocol",
+    important: true
+  }
+]
 //Create a Web Server
+const app = express();
+/*
 const app = http.createServer((request, response) => {
-  response.writeHead(200, { 'Content-Type': 'text/html' })
-  response.end('<h1>Hello World!</h1>')
+  response.writeHead(200, { 'Content-Type': 'application/json' })
+  response.end(JSON.stringify(notes))
 })
+*/
+//Set Server End Points
+app.get('/', (request, response) => {
+  response.send('<h1>Hello World!</h1>')
+})
+
+app.get('/api/notes', (request, response) => {
+  response.json(notes)
+})
+
 
 const PORT = 3001
 app.listen(PORT)
