@@ -32,6 +32,13 @@ const app = http.createServer((request, response) => {
   response.end(JSON.stringify(notes))
 })
 */
+const generateId = () => {
+  const maxId = notes.length > 0
+    ? Math.max(...notes.map(n => n.id))
+    : 0
+  return maxId + 1
+}
+
 //Set Server End Points
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
@@ -53,8 +60,23 @@ app.get('/api/notes/:id', (request, response) => {
 })
 
 app.post('/api/notes', (request, response) => {
-  const note = request.body
+  const body = request.body
+
+  if (!body.content) {
+    return response.status(400).json({ 
+      error: 'content missing' 
+    })
+  }
+  
+  const note = {
+    content: body.content,
+    important: Boolean(body.important) || false,
+    id: generateId(),
+  }
   console.log(note)
+
+  notes = notes.concat(note)
+
   response.json(note)
 })
 
