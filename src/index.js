@@ -23,6 +23,9 @@ let notes = [
 ]
 //Create a Web Server
 const app = express();
+
+app.use(express.json())
+
 /*
 const app = http.createServer((request, response) => {
   response.writeHead(200, { 'Content-Type': 'application/json' })
@@ -47,6 +50,12 @@ app.get('/api/notes/:id', (request, response) => {
   } else {
     response.status(404).end(`Note with id ${id} not found`)
   }
+})
+
+app.post('/api/notes', (request, response) => {
+  const note = request.body
+  console.log(note)
+  response.json(note)
 })
 
 app.delete('/api/notes/:id', (request, response) => {
