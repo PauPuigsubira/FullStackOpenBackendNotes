@@ -1,9 +1,7 @@
 //const http = require('http')
 const express = require("express");
-/*
-const math = require("./math");
-const androidData = require("./quizData");
-*/
+const cors = require("cors");
+
 let notes = [
   {
     id: 1,
@@ -35,6 +33,8 @@ const requestLogger = (request, response, next) => {
 };
 
 app.use(requestLogger);
+
+app.use(cors());
 
 /*
 const app = http.createServer((request, response) => {
