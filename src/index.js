@@ -21,8 +21,10 @@ let notes = [
 ];
 //Create a Web Server
 const app = express();
-
+//Treat request as JSON
 app.use(express.json());
+//Allow use of static html from dist folder
+app.use(express.static("dist"));
 
 const requestLogger = (request, response, next) => {
   console.log("Method:", request.method);
