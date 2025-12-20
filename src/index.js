@@ -1,7 +1,41 @@
+require('dotenv').config()
 //const http = require('http')
 const express = require("express");
 const cors = require("cors");
+const requestLogger = require("./middlewares/requestLogger");
+const Note = require("./models/note");
 
+// console.log('argumentos',process.argv);
+
+// const password = process.argv[2]
+// const url =
+//   `mongodb+srv://fullstackopen:${password}@fullstackopennotes.cirdsfw.mongodb.net/noteApp?appName=fullstackopenNotes`
+  
+// const noteSchema = new mongoose.Schema({
+//   content: String,
+//   important: Boolean,
+// })
+
+// noteSchema.set('toJSON', {
+//   transform: (document, returnedObject) => {
+//     returnedObject.id = returnedObject._id.toString()
+//     delete returnedObject._id
+//     delete returnedObject.__v
+//   }
+// })
+
+// const Note = mongoose.model('Note', noteSchema)
+
+// const connection = (query) => {
+//   mongoose.set('strictQuery',false)
+//   mongoose.connect(url)
+
+//   console.log(query)
+//   query()
+// }
+
+let notes = [];
+/*
 let notes = [
   {
     id: 1,
@@ -19,8 +53,9 @@ let notes = [
     important: true,
   },
 ];
+*/
 //Create a Web Server
-const app = express();
+const app = express(); 
 //Treat request as JSON
 app.use(express.json());
 //Allow use of static html from dist folder
@@ -48,18 +83,36 @@ app.get("/", (request, response) => {
 });
 */
 app.get("/api/notes", (request, response) => {
-  response.json(notes);
+  console.log('GET Notes',request.path)
+  // const findNotes = () => {
+    Note
+      .find({})
+      .then(result => {
+        console.log(result)
+        response.json(result)
+        //Note.connection.close()
+      })
+      .catch(err => response.status(400).json('Error: ' + err));
+  
+  // }
+  // connection(findNotes);
 });
 
 app.get("/api/notes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const note = notes.find((note) => note.id === id);
+  const id = request.params.id;
+  
+  Note
+    .find({id_: id})
+    .then(result => {
+      console.log('with id', id, result)
+      if (result.length > 0) {
+        response.json(result)
+      } else {
+        response.status(404).end(`Note with id ${id} not found`);
+      }
+    })
+    .catch(err => response.status(400).json('Error: ' + err));
 
-  if (note) {
-    response.json(note);
-  } else {
-    response.status(404).end(`Note with id ${id} not found`);
-  }
 });
 
 app.post("/api/notes", (request, response) => {
@@ -96,7 +149,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT);
 console.log(`Server running on port ${PORT} ${Date().toString()}`);
 //create a server object:
