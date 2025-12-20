@@ -26,14 +26,6 @@ app.use(express.json());
 //Allow use of static html from dist folder
 app.use(express.static("dist"));
 
-const requestLogger = (request, response, next) => {
-  console.log("Method:", request.method);
-  console.log("Path:  ", request.path);
-  console.log("Body:  ", request.body);
-  console.log("---");
-  next();
-};
-
 app.use(requestLogger);
 
 app.use(cors());
