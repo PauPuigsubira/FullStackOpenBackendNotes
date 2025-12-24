@@ -1,0 +1,45 @@
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+
+{
+  "content": "This is a new note created via REST client",
+  "important": true
+}
+###
+
+GET http://localhost:3001/api/notes
+
+###
+
+GET http://localhost:3001/api/notes/2
+
+###
+
+DELETE  http://localhost:3001/api/notes/2
+
+###
+
+PUT http://localhost:3001/api/notes/6946af000b5e7bf1f6a0d56d
+Content-Type: application/json
+
+{
+  "content": "This note has been updated via REST client",
+  "important": false
+}
+###
+
+PUT http://localhost:3001/api/notes/6
+Content-Type: application/json
+
+{
+  "content": "This note not exist and throw error via REST client",
+  "important": false
+}
+
+###
+PUT http://localhost:3001/api/notes/6946af000b5e7bf1f6a0d56d
+Content-Type: application/json
+
+{
+  "content": "This note has been updated via REST client"
+}

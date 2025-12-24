@@ -4,6 +4,8 @@ const express = require("express");
 const cors = require("cors");
 const requestLogger = require("./middlewares/requestLogger");
 const Note = require("./models/note");
+const { ObjectId } = require('./models/note');
+const errorHandler = require('./middlewares/errorHandler');
 
 // console.log('argumentos',process.argv);
 
@@ -56,11 +58,11 @@ let notes = [
 */
 //Create a Web Server
 const app = express(); 
-//Treat request as JSON
-app.use(express.json());
 //Allow use of static html from dist folder
 app.use(express.static("dist"));
-
+//Treat request as JSON
+app.use(express.json());
+//Handle request logging
 app.use(requestLogger);
 
 app.use(cors());
@@ -71,10 +73,6 @@ const app = http.createServer((request, response) => {
   response.end(JSON.stringify(notes))
 })
 */
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
-  return maxId + 1;
-};
 
 //Set Server End Points
 /*
@@ -98,11 +96,11 @@ app.get("/api/notes", (request, response) => {
   // connection(findNotes);
 });
 
-app.get("/api/notes/:id", (request, response) => {
+app.get("/api/notes/:id", (request, response, next) => {
   const id = request.params.id;
-  
+
   Note
-    .find({id_: id})
+    .find({_id: new ObjectId(id)})
     .then(result => {
       console.log('with id', id, result)
       if (result.length > 0) {
@@ -111,8 +109,8 @@ app.get("/api/notes/:id", (request, response) => {
         response.status(404).end(`Note with id ${id} not found`);
       }
     })
-    .catch(err => response.status(400).json('Error: ' + err));
-
+    //.catch(err => response.status(400).json('Error: ' + err));
+    .catch(err => next(err));
 });
 
 app.post("/api/notes", (request, response) => {
@@ -124,30 +122,57 @@ app.post("/api/notes", (request, response) => {
     });
   }
 
-  const note = {
+  const note = new Note({
     content: body.content,
-    important: Boolean(body.important) || false,
-    id: generateId(),
-  };
-  console.log(note);
+    important: Boolean(body.important) || false
+  });
 
-  notes = notes.concat(note);
-
-  response.json(note);
+  note
+    .save()
+    .then(savedNote => {
+      response.json(savedNote)
+    })
 });
 
+app.delete('/api/notes/:id', (request, response, next) => {
+  Note.findByIdAndDelete(request.params.id)
+    .then(()=> {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
+})
+/*
 app.delete("/api/notes/:id", (request, response) => {
   const id = Number(request.params.id);
   notes = notes.filter((note) => note.id !== id);
 
   response.status(204).end();
 });
+*/
+
+app.put('/api/notes/:id', (request, response, next) => {
+  const body = request.body
+
+  const note = {
+    content: body.content,
+    important: body.important,
+  }
+
+  Note.findByIdAndUpdate(request.params.id, note, { new: true })
+    .then(updatedNote => {
+      response.json(updatedNote)
+    })
+    .catch(error => next(error))
+})
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
 
 app.use(unknownEndpoint);
+
+// este debe ser el último middleware cargado, ¡también todas las rutas deben ser registrada antes que esto!
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT);

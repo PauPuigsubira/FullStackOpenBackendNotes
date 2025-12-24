@@ -8,9 +8,9 @@ console.log('connecting to', url)
 
 mongoose
   .connect(url)
-  .then(result => {
+  .then(
     console.log('connected to MongoDB')
-  })
+  )
   .catch(error => {
     console.log('error connecting to MongoDB:', error.message)
   })
@@ -28,4 +28,7 @@ noteSchema.set('toJSON', {
   }
 })
 
+const ObjectId = require('mongoose').Types.ObjectId; 
+
 module.exports = mongoose.model('Note', noteSchema)
+module.exports.ObjectId = ObjectId;
