@@ -22,11 +22,14 @@ GET http://localhost:3001/api/notes
 
 ###
 
+GET http://localhost:3001/api/notes/695410d48bbb3444b23f06b5
+###
+
 GET http://localhost:3001/api/notes/2
 
 ###
 
-DELETE http://localhost:3001/api/notes/6946af000b5e7bf1f6a0d56d
+DELETE http://localhost:3001/api/notes/695949c95fd680d68ac3755d
 
 ###
 

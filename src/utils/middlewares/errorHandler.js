@@ -1,6 +1,8 @@
+const logger = require('../logger')
+
 const errorHandler = (error, request, response, next) => {
-  console.error('error Name: ', error.name) 
-  console.error('error message: ', error.message)
+  logger.error('error Name: ', error.name) 
+  logger.error('error message: ', error.message)
 
   if (
     error.name === 'CastError' ||
