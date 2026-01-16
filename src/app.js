@@ -11,6 +11,8 @@ const cors = require("cors");
 const requestLogger = require("./utils/middlewares/requestLogger");
 const errorHandler = require('./utils/middlewares/errorHandler');
 const notesRouter = require('./controllers/notes')
+const usersRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 // Import with `import * as Sentry from "@sentry/node"` if you are using ESM
 const Sentry = require("@sentry/node");
 
@@ -41,6 +43,8 @@ app.use(requestLogger);
 app.use(cors());
 
 app.use('/api/notes', notesRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
 /*
 app.use("/api/v1/quiz", (req, res) => {

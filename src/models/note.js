@@ -20,14 +20,20 @@ const noteSchema = new mongoose.Schema({
   content: {
     type: String,
     minlength: 5,
-    required: true
+    required: true,
   },
-  important: Boolean,
+  important: { type: Boolean },
+  user: {    
+    type: mongoose.Schema.Types.ObjectId,    
+    ref: 'User',
+    required: true
+  }
 })
 
 noteSchema.set('toJSON', {
   transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
+    if (returnedObject._id) returnedObject.id = returnedObject._id.toString()
+    if (returnedObject.user && returnedObject.user._id) returnedObject.user = returnedObject.user._id.toString()
     delete returnedObject._id
     delete returnedObject.__v
   }

@@ -70,7 +70,7 @@ describe('Notes API tests', async () => {
       const notesAtStart = await helper.notesInDb()
   
       const noteToView = notesAtStart[0]
-  
+
       const resultNote = await api
         .get(`/api/notes/${noteToView.id}`)
         .expect(200)
@@ -113,6 +113,12 @@ describe('Notes API tests', async () => {
 
   describe('addition of a new note', () => {
     test('a valid note can be added ', async () => {
+      const token = await helper.getTokenFrom()
+      console.log('Using token:', token)
+      //const users = await helper.usersInDb()
+      //console.log('Users in DB:', users)
+      //const user = await users[0]
+      //console.log('Using user:', user) 
       const newNote = {
         content: 'async/await simplifies making async calls',
         important: true,
@@ -121,14 +127,35 @@ describe('Notes API tests', async () => {
       await api
         .post('/api/notes')
         .send(newNote)
+        .set('Authorization', `Bearer ${token}`)
+        .set('Accept', 'application/json')
         .expect(201)
         .expect('Content-Type', /application\/json/)
   
       const notesAtEnd = await helper.notesInDb()
+      //console.log('Notes at end length:', notesAtEnd.length)
       assert.strictEqual(notesAtEnd.length, helper.initialNotes.length + 1)
       
       const contents = notesAtEnd.map(n => n.content)
+      //console.log('Contents of notes at end:', contents)
       assert(contents.includes('async/await simplifies making async calls'))
+    })
+
+    test('addition fails with status code 401 if token is not provided', async () => {
+      const newNote = {
+        content: 'async/await simplifies making async calls',
+        important: true,
+      }
+    
+      await api
+        .post('/api/notes')
+        //.set('Authorization', `Bearer ${token}`)  --- IGNORE ---
+        .send(newNote)
+        .expect(401)
+    
+      const notesAtEnd = await helper.notesInDb()
+    
+      assert.strictEqual(notesAtEnd.length, helper.initialNotes.length)
     })
   
     test('note without content is not added', async () => {

@@ -1,7 +1,20 @@
+const jwt = require('jsonwebtoken')
 const notesRouter = require('express').Router()
 const Note = require("../models/note");
+const User = require('../models/user')
 //const { ObjectId } = require('../models/note');
 const { info } = require('../utils/logger');
+
+const getTokenFrom = request => {
+  console.log('Getting token from request headers...')
+  const authorization = request.get('Authorization')
+  console.log('Authorization header:', authorization)
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+  console.log('No token found in request')
+  return null
+}
 
 notesRouter.get('/', async(request, response) => {
   info('GET Notes',request.path)
@@ -16,7 +29,7 @@ notesRouter.get('/', async(request, response) => {
 */
 
 //  try {
-    const notes = await Note.find({})
+    const notes = await Note.find({}).populate('user', { username: 1, name: 1 })
     info(notes)
     response.json(notes)
 //  } catch (error) {
@@ -56,16 +69,27 @@ notesRouter.get('/:id', async (request, response) => {
 
 notesRouter.post('/', async (request, response) => {
   const body = request.body;
-
+  console.log('POST body:', body);
   if (!body.content) {
     return response.status(400).json({
       error: "content missing",
     });
   }
-
+  console.log('Getting token from request...', request.headers)
+  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)  
+    console.log('decoded token:', decodedToken)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  
+  const user = await User.findById(decodedToken.id)
+  console.log('User found by decoded token id:', user)
+  //const user = await User.findById(body.userId);
+  //console.log('User for new note:', user);
   const note = new Note({
     content: body.content,
-    important: Boolean(body.important) || false
+    important: Boolean(body.important) || false,
+    user: user.id,
   });
 /*
   note
@@ -76,6 +100,11 @@ notesRouter.post('/', async (request, response) => {
 
 //  try {
     const savedNote = await note.save()
+    //console.log('Saved note:', savedNote)
+    //console.log('user', user)
+    user.notes = user.notes.concat(savedNote.id)
+    await user.save()
+
     response.status(201).json(savedNote)
 //  } catch (error) {
 //    next(error)
