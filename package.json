@@ -4,23 +4,29 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "rm -rf dist && cd ../../part2/part2-notes-frontend && npm run build && cp -r dist ../../part3/FullStackOpenBackendNotes",
+    "start": "NODE_ENV=production node src/index.js",
+    "dev": "NODE_ENV=development nodemon src/index.js",
+    "test": "NODE_ENV=test node --test",
+    "test-only": "NODE_ENV=test npm test -- --test-only",
+    "build:ui": "rm -rf dist && cd ../../part3/FullStackOpenFrontendNotes && npm run build && cp -r dist ../../part3/FullStackOpenBackendNotes",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "dependencies": {
+    "@sentry/node": "10.32.1",
+    "bcrypt": "6.0.0",
     "cors": "2.8.5",
     "dotenv": "17.2.3",
     "express": "4.18.2",
+    "express-async-errors": "3.1.1",
+    "jsonwebtoken": "9.0.3",
     "mongoose": "9.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "eslint": "^9.39.2",
     "globals": "^16.5.0",
-    "nodemon": "1.18.4"
+    "nodemon": "1.18.4",
+    "supertest": "^7.1.4"
   },
   "author": "Matti Luukkainen",
   "license": "MIT",
