@@ -77,13 +77,19 @@ notesRouter.post('/', async (request, response) => {
   }
   console.log('Getting token from request...', request.headers)
   const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)  
-    console.log('decoded token:', decodedToken)
+    console.log('decoded token:', decodedToken.id, decodedToken)
   if (!decodedToken.id) {
     return response.status(401).json({ error: 'token invalid' })
   }
-  
-  const user = await User.findById(decodedToken.id)
-  console.log('User found by decoded token id:', user)
+  const tokenId = decodedToken.id
+  console.log(tokenId)
+  const user = await User.findById(tokenId)
+  console.log('User found by decoded token id:', user, 'token', decodedToken)
+  if (!user || user === null) {
+    const users = await User.find({})
+    const jsonUsers = users.map(u => u.toJSON())
+    console.log(jsonUsers)
+  }
   //const user = await User.findById(body.userId);
   //console.log('User for new note:', user);
   const note = new Note({

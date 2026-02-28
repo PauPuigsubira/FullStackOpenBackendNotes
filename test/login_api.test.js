@@ -38,7 +38,7 @@ describe('Login API tests', async () => {
     assert.strictEqual(response.body.username, loginDetails.username)
   })
 
-  test.only('login fails with incorrect credentials', async () => {
+  test('login fails with incorrect credentials', async () => {
     const loginDetails = {
       username: 'testuser',
       password: 'WrongPassword'
