@@ -5,13 +5,21 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../src/app')
 const helper = require('./test_helper')
+//const bcrypt = require('bcrypt')
+//const User = require('../src/models/user')
 
 const api = supertest(app)
 
 describe('Notes API tests', async () => {
   beforeEach(
     async () => {
+      //await User.deleteMany({})
       await Note.deleteMany({})
+
+      //const passwordHash = await bcrypt.hash('sekr&1', 10)
+      //const user = new User({ username: 'root', passwordHash })
+
+      //await user.save()
       await Note.insertMany(helper.initialNotes)
 /*       
       let noteObject = new Note(helper.initialNotes[0])
